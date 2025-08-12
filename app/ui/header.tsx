@@ -1,63 +1,47 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import clsx from 'clsx';
-import { useEffect, useState, useRef } from 'react';
+import { useState} from 'react';
 import NavLinks from './nav-link';
 import logoHorizontal from '@/public/logo-horizontal.svg';
 
 export default function TopNav() {
-
-  const [isScrolling, setIsScrolling] = useState(false);
-  const [hasScrolled, setHasScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setHasScrolled(scrollY > 0);
-      setIsScrolling(true);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      scrollTimeoutRef.current = setTimeout(() => setIsScrolling(false), 100);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    };
-  }, []);
+        const [isOpen, setIsOpen] = useState(false);
 
 
-
-const headerClass = clsx(
-  'fixed top-0 left-0 w-screen h-[10vh] md:h-[100px] pt-[2%] pb-0 transition-all duration-300',
-  {
-    'ww-screen h-screen': menuOpen,
-    'z-[60]': !menuOpen,
-    'z-[30]': menuOpen,
-    'bg-[#ecc994]': hasScrolled,
-    'bg-[#ecc994]/80 backdrop-blur-md': isScrolling,
-    'bg-transparent': (!isScrolling && !hasScrolled),
-    
-  }
-);
-
-  return (
-    <>
-      <header className={headerClass}>
-       <nav className="max-w-full mx-auto h-full  flex flex-col md:flex-row md:items-center justify-between">
-          <Link href="/#">
+    return (
+    <header className="bg-[#FFF0D7] border-b-2 border-[#D5B378]">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-4 text-black">
+            {/* Logo */}
+            <Link href="/#">
             <Image
-              src={logoHorizontal}
-              alt="Logo"
-              className="md:h-25 w-auto md:mb-10 hidden md:block"
-            />
-          </Link>
-          <NavLinks menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-        </nav>
-      </header>
-    </>
-  );
+                src={logoHorizontal}
+                alt="Logo"
+                className="md:h-25 w-auto "
+                />
+            </Link>
+
+            {/* Desktop Menu */}
+            <nav className="hidden md:flex space-x-8 text-black">
+            <NavLinks />
+            </nav>
+            
+            {/* Mobile Menu Button */}
+            <button
+            className="md:hidden p-2"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle menu"
+            >
+            {isOpen ? '✖' : '☰'}
+            </button>
+        </div>
+
+            {/* Mobile Menu */}
+            {isOpen && (
+                <nav className="md:hidden flex flex-col space-y-4 px-4 pb-4 text-black">
+                <NavLinks onClick={() => setIsOpen(false)} />
+                </nav>
+            )}
+        </header>
+    );
 }
